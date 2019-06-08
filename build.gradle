@@ -1,0 +1,96 @@
+plugins {
+    id 'org.springframework.boot' version '2.1.4.RELEASE'
+    id 'java'
+    id "io.spring.dependency-management" version "1.0.7.RELEASE"
+}
+
+group = 'com.show_me_kafka.sor'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', 'Greenwich.SR1')
+}
+
+configurations {
+    taskConfig
+}
+
+dependencies {
+    implementation 'org.springframework.cloud:spring-cloud-stream'
+    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-stream-schema'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor' 
+    implementation 'org.apache.avro:avro:1.8.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    taskConfig 'org.apache.avro:avro-tools:1.8.2'
+
+    // commented out, because they automatically mocked Kafka-binder out.. but i want to test agains a real KAfka please..
+    //testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+
+    }
+}
+
+def getAvroToolsJarPath() {
+    return configurations.taskConfig*.toURI().find { URI uri -> new File(uri).name.contains('avro-tools')}.path
+}
+
+task generateschemas(type:JavaExec) {
+    group 'Sor producer'
+    description 'Generates model class files, from avro schemas in main/resources/avro/*.avsr'
+
+    main="-jar"
+    args = [getAvroToolsJarPath(),
+            "compile",
+            "schema",
+            "src/main/resources/avro",
+            "./src/main/java/",
+    ]
+
+    doLast {
+        println ""
+        println "Java files should now have been generated, \nwith paths depending on the namespace of the avro schmas"
+    }
+}
+
+test {
+    failFast = true
+    maxParallelForks = 4
+
+    testLogging {
+        exceptionFormat = 'full'
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+}
+
+// Test-Logging - only log standardout, from a failing test (never mind the PASSED ones)
+project.test {
+    def outputCache = new LinkedList<String>()
+
+    beforeTest { TestDescriptor td -> outputCache.clear() }    // clear everything right before the test starts
+
+    onOutput { TestDescriptor td, TestOutputEvent toe ->       // when output is coming put it in the cache
+        outputCache.add(toe.getMessage())
+        while (outputCache.size() > 1000) outputCache.remove() // if we have more than 1000 lines -> drop first
+    }
+
+    /** after test -> decide what to print */
+    afterTest { TestDescriptor td, TestResult tr ->
+        if (tr.resultType == TestResult.ResultType.FAILURE && outputCache.size() > 0) {
+            println()
+            println(" Output of ${td.className}.${td.name}:")
+            outputCache.each { print(" > $it") }
+        }
+    }
+}

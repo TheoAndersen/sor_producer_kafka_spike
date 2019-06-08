@@ -1,0 +1,23 @@
+{
+  "namespace": "com.show_me_kafka.sor.sor_producer.model.kafka",
+  "type": "record",
+  "name": "HealthInstitution",
+  "fields": [
+    {
+      "name": "SorIdentifier",
+      "type": "string"
+    },
+    {
+      "name": "EntityName",
+      "type": "string"
+    },
+    {
+      "name": "EntityTypeIdentifier",
+      "type": "string"
+    },
+    {
+      "name": "ParentSorIdentifier",
+      "type": "string"
+    }
+  ]
+}

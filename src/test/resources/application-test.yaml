@@ -1,0 +1,24 @@
+sorproducer:
+  brokers: ${SORPRODUCER_BROKERS:#{localhost:9090}}
+  topic: sor_test
+  sorxmlurl: ikke_sat_endnu
+  schemaregistryurl: http://localhost:8089
+  run_automatically_on_startup: false  # otherwise the ApplicationStartupRunner will run on @SpringBootTest startup
+
+application.name: Sor-Producer-Test
+
+
+spring.cloud.stream.bindings.input.contentType: application/json
+spring.cloud.stream.bindings.input.destination: ${sorproducer.topic}
+spring.cloud.stream.bindings.mitsortopic:
+      producer:
+        partitionCount: 1
+
+#logging:
+#
+#  level:
+#    org.springframework: ERROR
+#    org.apache.kafka: ERROR
+#    org.apache.zookeeper: ERROR
+#    org.hibernate: ERROR
+

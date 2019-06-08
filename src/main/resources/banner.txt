@@ -1,0 +1,5 @@
+${application.title} ${application.version}
+Spring Boot ${spring-boot.version}
+brokers: ${spring.cloud.stream.kafka.binder.brokers}
+destination-topic: ${sorproducer.topic}
+schema-registry: ${spring.cloud.stream.schema-registry-client.endpoint}

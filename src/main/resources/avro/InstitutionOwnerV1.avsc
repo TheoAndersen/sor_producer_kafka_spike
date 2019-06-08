@@ -1,0 +1,19 @@
+{
+  "namespace": "com.show_me_kafka.sor.sor_producer.model.kafka",
+  "type": "record",
+  "name": "InstitutionOwner",
+  "fields": [
+    {
+      "name": "SorIdentifier",
+      "type": "string"
+    },
+    {
+      "name": "EntityName",
+      "type": "string"
+    },
+    {
+      "name": "EntityTypeIdentifier",
+      "type": "string"
+    }
+  ]
+}

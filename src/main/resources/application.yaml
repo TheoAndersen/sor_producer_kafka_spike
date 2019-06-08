@@ -1,0 +1,32 @@
+sorproducer:
+  brokers: ${SORPRODUCER_BROKERS}
+  topic: ${SORPRODUCER_TOPIC}
+  sorxmlurl: ${SORPRODUCER_SORXMLURL}
+  schemaregistryurl: ${SORPRODUCER_SCHEMAREGISTRYURL}
+  run_automatically_on_startup: true
+
+
+
+spring:
+  banner:
+    location: banner.txt
+  application.name: Sor-Producer
+  cloud.stream:
+    bindings.mitsortopic:
+      defaultCandidate: false
+      destination: ${sorproducer.topic}
+      contentType: application/*+avro
+      producer:
+        partitionCount: 3
+        sync: true
+    schema-registry-client:
+      endpoint: ${sorproducer.schemaregistryurl}
+    schema.avro.dynamicSchemaGenerationEnabled: false
+    kafka:
+      binder:
+        brokers: ${sorproducer.brokers}
+        autoCreateTopics: true
+        autoAddPartitions: true
+        configuration:
+          key.serializer: org.apache.kafka.common.serialization.StringSerializer
+spring.main.web-application-type: none

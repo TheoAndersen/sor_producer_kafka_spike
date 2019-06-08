@@ -1,0 +1,11 @@
+version: '3.6'
+services:
+  sor_producer:
+    build: .
+    command: sh -c "./gradlew test"
+    environment:
+      SORPRODUCER_BROKERS: kafka:9094
+      SORPRODUCER_SCHEMAREGISTRYURL: http://schema-registry:8990
+    depends_on:
+      - kafka
+      - schema-registry
